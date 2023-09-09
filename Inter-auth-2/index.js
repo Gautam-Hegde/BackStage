@@ -76,7 +76,7 @@ app.post('/admin/login',(req,res)=>{
 });
 
 
-app.post('/admin/courses',(req,res)=>{
+app.post('/admin/courses',authenticateJwt,(req,res)=>{
     const course=req.body;
     course.id=COURSE.length+1;
     COURSES.push(course);
@@ -85,7 +85,17 @@ app.post('/admin/courses',(req,res)=>{
 
 });
 
-app.put('/admin/courses/:courseId',(req,res)=>{
+app.put('/admin/courses/:courseId',authenticateJwt,(req,res)=>{
+const course=COURSES.find((c)=>{
+    return c.id===req.params.courseId;
+})
+if(course){
+    Object.assign(course,req.body);
+    fs.writeFileSync('courses.json',JSON.stringify(COURSES));
+    res.json({message:'Course updated successfully'});
+}else{
+    res.send(404).json({message:'course not found'});
+}
 
 });
 
