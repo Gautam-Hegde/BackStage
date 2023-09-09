@@ -57,7 +57,7 @@ app.post('/admin/signup',(req,res)=>{
         const newAdmin={username,password};
         ADMINS.push(newAdmin);
         fs.writeFileSync('admins.json',JSON.stringify(ADMINS));
-        const token = generateJwt(admin);
+        const token = generateJwt(newAdmin);
         res.json({message:'Admin created successfully',token});
     }
 
@@ -77,6 +77,11 @@ app.post('/admin/login',(req,res)=>{
 
 
 app.post('/admin/courses',(req,res)=>{
+    const course=req.body;
+    course.id=COURSE.length+1;
+    COURSES.push(course);
+    fs.writeFileSync('courses.json',JSON.stringify(COURSES));
+    res.json({message:'Course Created successfully',courseId:course.id});
 
 });
 
