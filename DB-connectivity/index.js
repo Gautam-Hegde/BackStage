@@ -48,7 +48,7 @@ const authenticateJwt = (req, res, next) => {
   }
 };
 
-mongoose.connect("mongodb+srv://Gautam:Gautam@cluster0.to1waup.mongodb.net/courses", { useNewUrlParser: true, useUnifiedTopology: true, dbName: "courses" });
+// mongoose.connect(uri+options);
 
 app.post('/admin/signup', (req, res) => {
   const { username, password } = req.body;
