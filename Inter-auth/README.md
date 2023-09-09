@@ -3,8 +3,8 @@
 Functionally it is the same as Basic-auth, routes are the same as well.
 But now auth is using Json Web Tokens(JWT) for the same.
 
+### JWT methods
 payload=serversecret
-### How to use
 token(random string)=jwt.sign(orginialstring, serversecret, [options, callback]); 
 
 jwt.verify(token, serversecret, (err, decoded) => {
