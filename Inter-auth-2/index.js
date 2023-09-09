@@ -96,15 +96,13 @@ if(course){
 }else{
     res.send(404).json({message:'course not found'});
 }
-
 });
 
-app.get('/admin/courses',(req,res)=>{
-
+app.get('/admin/courses',authenticateJwt,(req,res)=>{
+    res.json({courses:COURSES});
 });
 
 //user routes signup login getallcourse purchase getpurchased
-
 app.post('/user/signup',(req,res)=>{
 
 });
