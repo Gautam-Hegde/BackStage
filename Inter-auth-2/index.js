@@ -87,7 +87,7 @@ app.post('/admin/courses',authenticateJwt,(req,res)=>{
 
 app.put('/admin/courses/:courseId',authenticateJwt,(req,res)=>{
 const course=COURSES.find((c)=>{
-    return c.id===req.params.courseId;
+    return c.id===parseInt(req.params.courseId);
 })
 if(course){
     Object.assign(course,req.body);
@@ -104,23 +104,64 @@ app.get('/admin/courses',authenticateJwt,(req,res)=>{
 
 //user routes signup login getallcourse purchase getpurchased
 app.post('/user/signup',(req,res)=>{
+    const {username,password}=req.headers;
+    const user=USERS.find((u)=>{
+        return u.username===username;
+    });
+    if(user){
+        res.send(403).json({message:'User already exists'});
+    }else{
+        const newUser={username,password};
+        USERS.push(newUser);
+        fs.writeFileSync('users.json',JSON.stringify(USERS));
+        const token=generateJwt(newUser);
+        res.json({message:'User created Successfully',token});
+    }
 
 });
 
 
 app.post('/user/login',(req,res)=>{
-
+    const { username, password } = req.headers;
+     const user = USERS.find(u => u.username === username && u.password === password);
+  if (user) {
+    const token = generateJwt(user);
+    res.json({ message: 'Logged in successfully', token });
+  } else {
+    res.status(403).json({ message: 'Invalid username or password' });
+  }
 });
 
-app.get('/user/courses/',(req,res)=>{
-
+app.get('/user/courses/',authenticateJwt,(req,res)=>{
+    res.json({ courses: COURSES });
 });
-
+//to purchase
 app.post('/user/courses/:courseId',(req,res)=>{
-
+    const course = COURSES.find(c => c.id === parseInt(req.params.courseId));
+    if (course) {
+      const user = USERS.find(u => u.username === req.user.username);
+      if (user) {
+        if (!user.purchasedCourses) {
+          user.purchasedCourses = [];
+        }
+        user.purchasedCourses.push(course);
+        fs.writeFileSync('users.json', JSON.stringify(USERS));
+        res.json({ message: 'Course purchased successfully' });
+      } else {
+        res.status(403).json({ message: 'User not found' });
+      }
+    } else {
+      res.status(404).json({ message: 'Course not found' });
+    }
 });
-app.get('/user/purchasedCourses',(req,res)=>{
-
+//show purchased
+app.get('/user/purchasedCourses',authenticateJwt,(req,res)=>{
+    const user = USERS.find(u => u.username === req.user.username);
+    if (user) {
+      res.json({ purchasedCourses: user.purchasedCourses || [] });
+    } else {
+      res.status(403).json({ message: 'User not found' });
+    }
 });
 
 app.listen(3000, () => {
